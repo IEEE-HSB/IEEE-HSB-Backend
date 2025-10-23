@@ -1,0 +1,51 @@
+# ====================================
+# Node.js / Express .gitignore
+# ====================================
+
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Build outputs
+dist/
+build/
+tmp/
+temp/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Cache
+.cache/
+.npm/
+.yarn/
+.pnpm-store/
+
+# TypeScript build
+*.tsbuildinfo
+
+# Optional: Ignore uploaded files (if you use uploads)
+uploads/
