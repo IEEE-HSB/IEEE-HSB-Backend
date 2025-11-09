@@ -5,7 +5,7 @@ import { asyncHandler, successResponse , globalErrorHandler } from "../../utils/
 import * as jwt from "../../utils/security/jwt.security.js";
 
 export const register = asyncHandler(async (req, res) => {
-    const { name , email , password } = req.body;
+    const { name , email , password , rolePerson} = req.body;
     if (!name || !email || !password) {
         return next(new Error("All fields are required"));
     }
@@ -13,7 +13,7 @@ export const register = asyncHandler(async (req, res) => {
         return next(new Error("User already exists"));
     }
     const hashedPassword = await bcrypt.hashPassword(password);
-    const user = await DBservice.create({ model: User, data: { name, email, passwordHash: hashedPassword} });
+    const user = await DBservice.create({ model: User, data: { name, email, passwordHash: hashedPassword ,role:rolePerson } });
 
     const accessToken = jwt.generateToken({ payload: { userId: user._id } });
 
