@@ -15,7 +15,6 @@ export const createTokens = ({
     expiresIn: accessExpiresIn,
     secret: accessSecret,
   });
-
   const refreshTokenValue = generateToken({
     payload: { userId: payload.userId },
     expiresIn: refreshExpiresIn,

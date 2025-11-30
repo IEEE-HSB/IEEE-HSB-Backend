@@ -4,9 +4,11 @@ import * as bcrypt from "../../utils/security/bycrept.js";
 import { asyncHandler, successResponse , globalErrorHandler } from "../../utils/response.js";
 import * as jwt from "../../utils/security/jwt.security.js";
 
-export const register = asyncHandler(async (req, res) => {
+export const register = asyncHandler(async (req, res , next) => {
     const { name , email , password , rolePerson} = req.body;
-    if (!name || !email || !password) {
+    console.log(req.body)
+/* This code snippet is performing form validation in the `register` function. It checks if any of the required fields (`name`, `email`, `password`, `rolePerson`) are missing or empty. If any of these fields are missing or empty, it will return an error message indicating that all fields are required. This helps ensure that the user provides all the necessary information before attempting to register a new user. */
+    if (!name || !email || !password || !rolePerson) {
         return next(new Error("All fields are required"));
     }
     if(await DBservice.findOne({ model: User, filter: { email } })){
@@ -28,7 +30,7 @@ export const login = asyncHandler(async (req, res, next) => {
   
     // البحث عن المستخدم
     const user = await DBservice.findOne({ model: User, filter: { email } }); // Exclude password from the response
-  
+    console.log(user);
     if (!user) {
       return next(new Error("Invalid email or password", { cause: 401 }));
     }
@@ -36,7 +38,7 @@ export const login = asyncHandler(async (req, res, next) => {
     // التحقق من كلمة المرور
     const isPasswordValid = await bcrypt.comparePassword(
       password,
-      user.password
+      user.passwordHash
     );
     // داله الكومبير بتاخد اتنين باراميتر اول واحد الباسورد اللى اليوزر مدخله
     //و التاني بتكتب الباسورد اللى متدخل ف الداتا بيز و تبدا تقارن بقى
@@ -46,7 +48,7 @@ export const login = asyncHandler(async (req, res, next) => {
 
     // إنشاء token
     const { accessToken: token, refreshToken: refresh_Token} =
-      jsonwebtoken.createTokens({
+      jwt.createTokens({
         payload: { userId: user._id },
         accessExpiresIn: process.env.JWT_EXPIRE,
         refreshExpiresIn: process.env.JWT_EXPIRE_REFRESH,
@@ -71,12 +73,11 @@ export const login = asyncHandler(async (req, res, next) => {
     return successResponse({
       res,
       data: {
-        token,
-        refresh_Token,
-        user: { isVerified: user.isVerified },
-        role: user.role,
+        user,
+        accessToken: token,
+        refreshToken: refresh_Token,
       },
-      message: "Login successful",
-      statusCode: 200,
+      message: "User logged in successfully",
+      status: 200,
     });
   });

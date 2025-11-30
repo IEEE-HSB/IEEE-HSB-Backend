@@ -26,18 +26,23 @@ const eventSchema = new Schema({
         type: String,
         required: true,
     },
-    coverImage: {
-        type: String,
-        required: true,
-    },
+    coverImage: [{
+        secure_url: {
+            type: String,
+        },
+        public_id: {
+            type: String,
+        }
+    }],
     chapterId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Chapter",
     },
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Committee",
-    },
+    // createdBy: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Committee",
+    //     default: null,
+    // },
     startDate: {
         type: Date,
         required: true,
@@ -68,15 +73,8 @@ const eventSchema = new Schema({
         enum: ["upcoming", "past"],
         // required: true,
     },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now,
-    },
 });
+const Event = mongoose.model("Event", eventSchema);
 
-export default mongoose.model("Event", eventSchema);
+export default Event;
     

@@ -1,19 +1,27 @@
 
 
 export const asyncHandler = (fn) => (req, res, next) => {
-        fn(req, res, next).catch((err)=>{
-            console.error("asyncHandler error", err);
-            next(new Error(err.message || "Something went wrong") ,{status:err.status || 500});
-        })
-    };
-
-export const globalErrorHandler = (err , req , res , next ) => {
-    console.error("globalErrorHandler error", err);
-    res.status(err.status || 500).json({message: err.message || "Something went wrong" , success: false ,error:error.stack || error.toString()});
+    fn(req, res, next).catch((error) => {
+        console.error("Async Handler Error:", error);
+        next(new Error(error.message || "Internal Server Error", { cause: error.status || 500 }));
+    });
 }
 
+    export const globalErrorHandler = (error, req, res, next) => {
+        console.error("Global Error Handler:", error);
+        res.status(error.cause || 500).json({
+            success: false,
+            message: error.message || "Internal Server Error",
+            error: error.stack || error.toString()
+        });
+    }
 
-export const successResponse = (res , data={} , message = "success" , status = 200) => {
-    res.status(status).json({message , success : true , data});
+
+export const successResponse = ({res, data = {}, message = 'Operation successful', statusCode = 200}={}) => {
+    res.status(statusCode).json({
+        success: true,
+        message,
+        data
+    });
 }
 

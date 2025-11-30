@@ -34,6 +34,9 @@ export const findById = async ({ model, id, select = "", populate = [] } = {}) =
 
 // Create new document(s)
 export const create = async ({ model, data = {}, options = { validateBeforeSave: true } } = {}) => {
+    if (Array.isArray(data)) {
+        return await model.insertMany(data, options);
+    }
     return await model.create(data, options);
 }
 

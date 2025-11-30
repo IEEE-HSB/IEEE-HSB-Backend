@@ -20,10 +20,16 @@ const gallerySchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Committee",
     },
-    imageUrl: {
-        type: String,
-        required: true,
-    },
+    imageUrl:[
+        {
+            secure_url: {
+                type: String,
+            },
+            public_id: {
+                type: String,
+            }
+        }
+    ],
     title: {
         type: String,
         required: true,
