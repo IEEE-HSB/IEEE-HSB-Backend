@@ -1,17 +1,27 @@
 import { Router } from "express";
 import * as galleryController from "./gallary.service.js";
+import { fileUpload } from "../../utils/multier/cloudinary.middelware.js";
+import { authMiddleware } from "../../middleware/auth.middleware.js";
+
 const router = Router();
 
-// Method	Endpoint	Description
-// GET	/api/gallery	Get all gallery items
-// GET	/api/gallery?chapterId=...	Get gallery items filtered by chapter
-// GET	/api/gallery/:id	Get a single gallery item
-// POST	/api/gallery	Add a new gallery item
-// DELETE	/api/gallery/:id	Delete a gallery item by ID
+// Get All (Public)
+router.get("/", galleryController.getAllGallery);
 
-router.get("/",galleryController.getAllGallery);
+// Get One (Public)
 router.get("/:id", galleryController.getGalleryById);
-router.post("/", galleryController.createGallery);
-router.delete("/:id", galleryController.deleteGalleryById);
+
+router.post(
+    "/", 
+    authMiddleware,
+    fileUpload().single("image"),
+    galleryController.createGallery
+);
+
+router.delete(
+    "/:id",
+    authMiddleware,
+    galleryController.deleteGalleryById
+);
 
 export default router;

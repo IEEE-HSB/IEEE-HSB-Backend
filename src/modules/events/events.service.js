@@ -1,107 +1,164 @@
+import Event from "../../models/eventModel.js";
+import Chapter from "../../models/chapterModel.js";
 import * as DBservice from "../../DB/DB.service.js";
 import { asyncHandler, successResponse , globalErrorHandler } from "../../utils/response.js";
-import * as jwt from "../../utils/security/jwt.security.js";
-import { uploadFilesCloud ,uploadFileCloud, deleteFileCloud  } from "../../utils/multier/cloudinary.js";
-import Event from "../../models/eventModel.js";
+import { uploadFileCloud, deleteFileCloud } from "../../utils/multier/cloudinary.js";
 
-export const createEvent = asyncHandler(async (req, res) => {
+export const createEvent = asyncHandler(async (req, res, next) => {
     const {
         name,
+        title,
         location,
         details,
+        moreDetails,
         link,
         chapterId,
+        date,
         endTime
     } = req.body;
-    console.log(req.user)
-    console.log(req.file);
+
+
+    console.log("req.body", req.body);
     
+
     if (!req.file) { 
-        return new Error("Image is required");
+        return next(new Error("Image is required"));
     }
 
-    // رفع الصورة على Cloudinary
+
+    console.log("chapterId", chapterId);
+    
+
+    const chapter = await DBservice.findOne({
+        model: Chapter,
+        filter: { code: chapterId }
+    });
+    console.log(chapter);
+    
+    
+    if (!chapter) return next(new Error("Invalid Chapter Code"));
+
     const { secure_url, public_id } = await uploadFileCloud({
         file: req.file,
         path: "events"
     });
 
-    const start = new Date();
+
+    const start = new Date(date);
+    const end = new Date(start.getTime() + (endTime || 2) * 60 * 60 * 1000);
     const status = start > new Date() ? "upcoming" : "past";
-    const end = new Date(start.getTime() + (endTime || 2 )*60 * 60 * 1000);
+
+    // 4. الحفظ
     const event = await DBservice.create({
         model: Event,
         data: {
-            title: name,
+            title: title,
             description: details,
-            location: location,
+            moreDetails,
+            location,
             startDate: start,
             endDate: end,
             registrationRequired: !!link,
             registrationLink: link || "",
             visibility: "public",
-            coverImage: [{ secure_url, public_id }],
-            chapterId : chapterId,
-            // createdBy: req.user._id,
-            status: status
+            coverImage: { secure_url, public_id },
+            chapterId: chapter._id,
+            status
         }
     });
 
-    return successResponse(res, event, "Event created successfully");
+    return successResponse({res, data: event, message: "Event created successfully" , status: 201});
 });
 
+export const getAllEvents = asyncHandler(async (req, res, next) => {
+    const { chapterId } = req.query;
 
+    let filter = {};
 
-export const getAllEvents = asyncHandler(async (req, res) => {
-    const events = await DBservice.find({ model: "Event" });
-    return successResponse(res, events , "events found successfully");
-})
+    if (chapterId) {
+        const chapter = await DBservice.findOne({ model: Chapter, filter: { code: chapterId } });
+        if (chapter) {
+            filter.chapterId = chapter._id;
+        } else {
+            return successResponse(res, { events: {} }, "No events found (Invalid Chapter)");
+        }
+    }
 
-export const getEventById = asyncHandler(async (req, res) => {
+    // 2. هات كل الإيفنتات (واعمل Populate عشان نعرف اسم الشابتر)
+    const events = await Event.find(filter).populate("chapterId", "code").sort({ startDate: -1 });
+
+    // 3. تجميع بالسنين (Grouping Logic)
+    const groupedEvents = events.reduce((acc, event) => {
+        const year = new Date(event.startDate).getFullYear().toString();
+        
+        if (!acc[year]) acc[year] = [];
+
+        acc[year].push({
+            id: event._id,
+            name: event.title,
+            date: event.startDate.toISOString().split('T')[0],
+            location: event.location,
+            details: event.description,
+            moreDetails: event.moreDetails,
+            image: event.coverImage.secure_url,
+            chapterId: event.chapterId?.code || "General" // نرجع "CS" للفرونت
+        });
+
+        return acc;
+    }, {});
+
+    return successResponse({res, data: groupedEvents, message: "Events found successfully" , status: 200});
+});
+
+export const getEventById = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-    const event = await DBservice.findOne({ model: "Event", filter: { _id: id } });
-    return successResponse(res, event , "event found successfully");
-})
+    const event = await DBservice.findOne({ model: Event, filter: { _id: id } });
+    
+    if(!event) return next(new Error("Event not found"));
+
+    return successResponse({res, data: event, message: "Event found successfully" , status: 200});
+});
 
 export const updateEvent = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     let updateData = req.body;
 
-    const event = await DBservice.findOne({ model: "Event", filter: { _id: id } });
-    if (!event) {
-        return next(new Error("Event not found"));
-    }
+    const event = await DBservice.findOne({ model: Event, filter: { _id: id } });
+    if (!event) return next(new Error("Event not found"));
 
-    // لو في صورة جديدة
     if (req.file) {
-        if (event.coverImage?.length > 0) {
-            const oldImage = event.coverImage[0].public_id;
-            if (oldImage) await deleteFileCloud({ public_id: oldImage });
+        if (event.coverImage?.public_id) {
+            await deleteFileCloud({ public_id: event.coverImage.public_id });
         }
-
         const { secure_url, public_id } = await uploadFileCloud({
             file: req.file,
             path: "events"
         });
-
-        updateData.coverImage = [{ secure_url, public_id }];
+        updateData.coverImage = { secure_url, public_id };
     }
 
     const updatedEvent = await DBservice.findOneAndUpdate({
-        model: "Event",
+        model: Event,
         filter: { _id: id },
         data: updateData
     });
 
-    return successResponse(res, updatedEvent, "Event updated successfully");
+    return successResponse({res, data: updatedEvent, message: "Event updated successfully" , status: 200});
 });
 
-
-
-export const deleteEvent = asyncHandler(async (req, res) => {
+export const deleteEvent = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-    const event = await DBservice.findOne({ model: "Event", filter: { _id: id } });
-    const deletedEvent = await DBservice.delete({ model: "Event", filter: { _id: id } });
-    return successResponse(res, deletedEvent , "event deleted successfully");
-})
+    console.log(id);
+    
+    const event = await DBservice.findOne({ model: Event, filter: { _id: id } });
+    console.log(event);
+    
+    if (!event) return next(new Error("Event not found"));
 
+    if (event.coverImage?.public_id) {
+        await deleteFileCloud({ public_id: event.coverImage.public_id });
+    }
+
+    const deletedEvent = await DBservice.deleteOne({ model: Event, filter: { _id: id } });
+    return successResponse({res, data: deletedEvent, message: "Event deleted successfully" , status: 200});
+});

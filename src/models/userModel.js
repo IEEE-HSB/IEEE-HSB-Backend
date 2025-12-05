@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
-
+import { USER_LEVELS, USER_ROLES, USER_STATUS } from "../utils/enums/index.js";
+import { uppercase } from "zod";
+import { COMMITTEES } from "../utils/enums/committe.enum.js";
 export const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -17,21 +19,23 @@ export const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ["guest", "participant", "volunteer", "director", "chair", "admin"],
-        default: "guest",
+        enum: Object.values(USER_ROLES),
+        default: USER_ROLES.PARTICIPANT,
     },
     chapterId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Chapter",
     },
-    committeeId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Committee",
+    committee: {
+        type: String,
+        uppercase : true,
+        enum: Object.values(COMMITTEES),
+        default: COMMITTEES.OTHER,
     },
     status: {
         type: String,
-        enum: ["pending", "active", "rejected"],
-        default: "pending",
+        enum: Object.values(USER_STATUS),
+        default: USER_STATUS.PENDING,
     },
     points: {
         type: Number,
@@ -39,8 +43,8 @@ export const userSchema = new mongoose.Schema({
     },
     level: {
         type: String,
-        enum: ["bronze", "silver", "gold"],
-        default: "bronze",
+        enum: Object.values(USER_LEVELS),
+        default: USER_LEVELS.BRONZE,
     },
     badges: {
         type: [mongoose.Schema.Types.ObjectId],
@@ -57,18 +61,3 @@ export const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 export default User;
-
-//users
-// - _id (ObjectId)
-// - name (string)
-// - email (string)
-// - passwordHash (string)
-// - role (string: guest/participant/volunteer/director/chair/admin)
-// - chapterId (ObjectId)
-// - committeeId (ObjectId) // optional
-// - status (string: pending/active/rejected)
-// - points (number)
-// - level (string)
-// - badges (array of ObjectId badgeIds)
-// - invitedBy (ObjectId)
-// - createdAt, updatedAt

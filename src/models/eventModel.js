@@ -1,19 +1,3 @@
-// events
-// - _id
-// - title (string)
-// - description (string)
-// - coverImage (url)
-// - chapterId (ObjectId)
-// - createdBy (chairId)
-// - startDate (Date)
-// - endDate (Date)
-// - location (string)
-// - registrationRequired (boolean)
-// - registrationLink (string)
-// - visibility (public/private)
-// - status (upcoming/past)
-// - createdAt, updatedAt
-
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
@@ -26,55 +10,45 @@ const eventSchema = new Schema({
         type: String,
         required: true,
     },
-    coverImage: [{
-        secure_url: {
-            type: String,
-        },
-        public_id: {
-            type: String,
-        }
-    }],
+    moreDetails: { // ضفنا ده عشان التاسك
+        type: String, 
+    },
+    coverImage: { // خليناها Object واحد
+        secure_url: { type: String, required: true },
+        public_id: { type: String, required: true }
+    },
     chapterId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Chapter",
+        required: true
     },
-    // createdBy: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Committee",
-    //     default: null,
-    // },
     startDate: {
         type: Date,
-        required: true,
     },
     endDate: {
         type: Date,
-        // required: true,
     },
     location: {
         type: String,
-        required: true,
     },
     registrationRequired: {
         type: Boolean,
-        // required: true,
+        default: false,
     },
     registrationLink: {
         type: String,
-        // required: true,
     },
     visibility: {
         type: String,
         enum: ["public", "private"],
-        // required: true,
+        default: "public",
     },
     status: {
         type: String,
         enum: ["upcoming", "past"],
-        // required: true,
+        default: "upcoming",
     },
-});
-const Event = mongoose.model("Event", eventSchema);
+}, { timestamps: true });
 
+const Event = mongoose.model("Event", eventSchema);
 export default Event;
-    

@@ -1,42 +1,25 @@
-// gallery
-// - _id
-// - chapterId (ObjectId)
-// - uploadedBy (chairId)
-// - imageUrl (string)
-// - title (string)
-// - description (string)
-// - eventId (ObjectId, optional)
-// - uploadedAt (Date)
-
 import mongoose from "mongoose";
-const Schema = mongoose.Schema;
 
-const gallerySchema = new Schema({
+const gallerySchema = new mongoose.Schema({
     chapterId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Chapter",
+        required: true
     },
     uploadedBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Committee",
+        ref: "User",
     },
-    imageUrl:[
-        {
-            secure_url: {
-                type: String,
-            },
-            public_id: {
-                type: String,
-            }
-        }
-    ],
+    image: {
+        secure_url: { type: String, required: true },
+        public_id: { type: String, required: true }
+    },
     title: {
         type: String,
         required: true,
     },
     description: {
-        type: String,
-        required: true,
+        type: String, 
     },
     eventId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -46,6 +29,6 @@ const gallerySchema = new Schema({
         type: Date,
         default: Date.now,
     },
-});
+}, { timestamps: true });
 
 export default mongoose.model("Gallery", gallerySchema);
