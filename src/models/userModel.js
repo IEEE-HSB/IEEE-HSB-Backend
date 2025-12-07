@@ -28,7 +28,6 @@ export const userSchema = new mongoose.Schema({
     },
     committee: {
         type: String,
-        uppercase : true,
         enum: Object.values(COMMITTEES),
         default: COMMITTEES.OTHER,
     },
@@ -54,6 +53,12 @@ export const userSchema = new mongoose.Schema({
     invitedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+    },
+    HashOtp: {
+        type: String
+    },
+    otpExpireAt: {
+        type: Date
     },
 }, {
     timestamps: true,
