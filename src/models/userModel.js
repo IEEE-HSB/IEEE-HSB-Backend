@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import { USER_LEVELS, USER_ROLES, USER_STATUS } from "../utils/enums/index.js";
-import { uppercase } from "zod";
 import { COMMITTEES } from "../utils/enums/committe.enum.js";
 export const userSchema = new mongoose.Schema({
     name: {

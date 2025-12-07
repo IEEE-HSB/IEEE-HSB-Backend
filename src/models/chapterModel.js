@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { CHAPTER } from "../utils/enums/index.js";
-import { uppercase } from "zod";
+
 const Schema = mongoose.Schema;
 // code: "cs",
 //     name: "Computer Society",
