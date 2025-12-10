@@ -7,12 +7,12 @@ import eventController from './modules/events/events.controller.js';
 import gallaryController from './modules/gallary/gallary.controller.js';
 import projectController from './modules/project/project.controller.js';
 import announcementController from './modules/announcement/announcement.controller.js';
-
+import cors from 'cors';
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
-
+app.use(cors());
 // 1. تشغيل الـ Middlewares
 app.use(express.json());
 
