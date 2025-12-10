@@ -5,7 +5,7 @@ import { asyncHandler, successResponse , globalErrorHandler } from '../../utils/
 
 export const getAllChapters = asyncHandler(async (req, res) => {
     const chapters = await DBservice.find({ model: chapterModel });
-    return successResponse(res, chapters , "chapters found successfully");
+    return successResponse({ res, data: chapters, message: "Chapters found successfully" });
 })
 
 export const getChapterByIdCommittee = asyncHandler(async (req, res) => {

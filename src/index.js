@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 // 2. الاتصال بالداتابيز
-connectDB(); 
+connectDB();
 
 // 3. رسالة ترحيب (Root Route)
 app.get("/", (req, res) => {
