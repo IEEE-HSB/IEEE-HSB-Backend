@@ -7,4 +7,5 @@ export const CHAPTER = Object.freeze({
     WIE: "Women in Engineering",
     RAS: "Robotics & Automation Society",
     PES: "Power & Energy Society",
+    IEEE: "IEEE",
 })

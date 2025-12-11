@@ -33,6 +33,12 @@ const chapters =
         name: "Power & Energy Society",
         brief: "The heart of electrical power, renewable energy, and sustainability.",
         description: "The heart of electrical power, renewable energy, and sustainability. PES proudly includes 6 active tracks, Home Automation, Basic & Advanced Industerial Automation, Renewable Energy, and Electric Distribution (AutoCAD & REVIT), that deliver technical sessions, industrial visits, and innovation projects, preparing students for careers in the energy sector."
+      },
+      {
+        code : "IEEE",
+        name: "IEEE",
+        brief: "IEEE",
+        description: "IEEE"
       }
 ];
 
