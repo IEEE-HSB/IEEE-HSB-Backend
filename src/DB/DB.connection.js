@@ -1,19 +1,29 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-dotenv.config();
+
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
 
 const connectDB = async () => {
-    try {
-        console.log("Connecting to database...");
-        console.log(process.env.MONGOOSE_URL);
-        
-       const result = await mongoose.connect(process.env.MONGOOSE_URL , {
-        serverSelectionTimeoutMS: 5000, //ديه عشان بتعمل تايماوت للاتصال بالداتا بيز
-       });
-        console.log("Database connected");
-    } catch (error) {
-        console.log(error);
-    }
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(process.env.MONGOOSE_URL, {
+      serverSelectionTimeoutMS: 5000,
+    }).then((mongoose) => mongoose);
+  }
+
+  cached.conn = await cached.promise;
+  console.log("Database connected");
+  console.log(cached.conn);
+  console.log(process.env.MONGOOSE_URL);
+  
+  
+  return cached.conn;
 };
 
 export default connectDB;
