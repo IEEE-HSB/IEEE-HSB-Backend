@@ -3,7 +3,7 @@ import { asyncHandler, successResponse } from "../../utils/response.js";
 
 export const createAnnouncement = asyncHandler(async (req, res, next) => {
     const { title, description , link } = req.body;
-    const announcement = await Announcement.create({ title, description });
+    const announcement = await Announcement.create({ title, description , link });
     return successResponse({ res, data: announcement, message: "Announcement created successfully" });
 });
 

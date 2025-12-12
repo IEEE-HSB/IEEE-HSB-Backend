@@ -7,6 +7,7 @@ import { USER_STATUS } from "../../utils/enums/status.enum.js";
 import Chapter from "../../models/chapterModel.js";
 import { compareOtp, generateOTP, hashOtp, otpExpireAt } from "../../utils/security/otp.js";
 import eventEmitter from "../../utils/event/event.email.js";
+import { USER_ROLES } from "../../utils/enums/roles.enum.js";
 
 export const register = asyncHandler(async (req, res , next) => {
     const { name , email , password , role , chapterId , committeeId } = req.body;
@@ -28,15 +29,31 @@ export const register = asyncHandler(async (req, res , next) => {
     if(await DBservice.findOne({ model: User, filter: { email } })){
         return next(new Error("User already exists"));
     }
+    // if(role === USER_ROLES.CHAIRPERSON){
+    //   const realStates = USER_STATUS.ACTIVE;
+    //   const user = await DBservice.create({ model: User, data: { name, email, passwordHash: password ,role , chapterId: chapterIdObjectId , realStates } });
+    // }
     const hashedPassword = await bcrypt.hashPassword(password);
-    const user = await DBservice.create({ model: User, data: { name, email, passwordHash: hashedPassword ,role , chapterId: chapterIdObjectId , committee: committeeId } });
-    let chapterObjectId = null;
 
+    const userData={
+        name,
+        email,
+        passwordHash: hashedPassword,
+        role,
+        chapterId: chapterIdObjectId,
+        committeeId: committeeId,
+    }
+    if(role === USER_ROLES.CHAIRPERSON || role === USER_ROLES.ADMIN){
+        userData.status = USER_STATUS.ACTIVE;
+    }
+
+
+    const user = await DBservice.create({ model: User, data: userData });
     const accessToken = jwt.generateToken({ payload: { userId: user._id } });
 
     const refreshToken = jwt.generateToken({ payload: { userId: user._id }, secret: process.env.JWT_SECRET_REFRESH });
     
-    return successResponse({ res, data: { accessToken, refreshToken }, message: "User registered successfully" });
+    return successResponse({ res, data: { accessToken, refreshToken , user}, message: "User registered successfully" });
 })
 
 
