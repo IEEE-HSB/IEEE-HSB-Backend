@@ -58,77 +58,70 @@ export const register = asyncHandler(async (req, res , next) => {
 
 
 export const login = asyncHandler(async (req, res, next) => {
-    const { email, password } = req.body;
-  
-    // البحث عن المستخدم
-    const user = await DBservice.findOne({ model: User, filter: { email } }); // Exclude password from the response
-    console.log(user);
-    if (!user) {
-      return next(new Error("Invalid email or password", { cause: 401 }));
-    }
-  
-    const isPasswordValid = await bcrypt.comparePassword(
-      password,
-      user.passwordHash
-    );
-    if (!isPasswordValid) {
-      return next(new Error("Invalid email or password", { cause: 401 }));
-    }
-    // if(user.status === USER_STATUS.PENDING){
-    //     return next(new Error("User is pending", { cause: 401 }));
-    // }
+  const { email, password } = req.body;
 
-    const response = 
-    {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        chapterId: user.chapterId,
-        committeeId: user.committeeId,
-        status: user.status,
-        points: user.points,
-        level: user.level,
-        badges: user.badges,
-        invitedBy: user.invitedBy,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-    }
-
-    const { accessToken: token, refreshToken: refresh_Token} =
-      jwt.createTokens({
-        payload: { userId: user._id },
-        accessExpiresIn: process.env.JWT_EXPIRE,
-        refreshExpiresIn: process.env.JWT_EXPIRE_REFRESH,
-        accessSecret: process.env.JWT_SECRET,
-        refreshSecret: process.env.JWT_SECRET_REFRESH,
-      });
-  
-    // const token = jsonwebtoken.generateToken({
-    //   payload: { userId: user._id },
-    //   secret: signtures.secretKey.accessKey
-    // });
-  
-    // const refresh_Token = jsonwebtoken.refreshToken({
-    //   userId: user._id,
-    //   secret: signtures.refreshKey
-    // });
-    // console.log("refresh_Token", refresh_Token);
-    // console.log("expired time to refresh",process.env.JWT_EXPIRE_REFRESH);
-    
-    // console.log("secretkaysysysy", signtures.secretKey.accessKey);
-  
-    return successResponse({
-      res,
-      data: {
-        ...response,
-        accessToken: token,
-        refreshToken: refresh_Token,
-      },
-      message: "User logged in successfully",
-      status: 200,
-    });
+  const user = await DBservice.findOne({
+    model: User,
+    filter: { email },
+    populate: { path: "chapterId", select: "code name" }
   });
+
+  if (!user) {
+    return next(new Error("Invalid email or password", { cause: 401 }));
+  }
+
+  const isPasswordValid = await bcrypt.comparePassword(
+    password,
+    user.passwordHash
+  );
+
+  if (!isPasswordValid) {
+    return next(new Error("Invalid email or password", { cause: 401 }));
+  }
+
+  const response = {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+
+    chapter: user.chapterId
+      ? {
+          id: user.chapterId._id,
+          code: user.chapterId.code,
+          name: user.chapterId.name,
+        }
+      : null,
+
+    committee: user.committeeId, // static
+    status: user.status,
+    points: user.points,
+    level: user.level,
+    badges: user.badges,
+    invitedBy: user.invitedBy,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
+
+  const { accessToken, refreshToken } = jwt.createTokens({
+    payload: { userId: user._id },
+    accessExpiresIn: process.env.JWT_EXPIRE,
+    refreshExpiresIn: process.env.JWT_EXPIRE_REFRESH,
+    accessSecret: process.env.JWT_SECRET,
+    refreshSecret: process.env.JWT_SECRET_REFRESH,
+  });
+
+  return successResponse({
+    res,
+    data: {
+      ...response,
+      accessToken,
+      refreshToken,
+    },
+    message: "User logged in successfully",
+  });
+});
+
 
 
 
