@@ -69,7 +69,7 @@ export const login = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new Error("Invalid email or password", { cause: 401 }));
   }
-  if(user.status === USER_STATUS.INACTIVE || user.status === USER_STATUS.PENDING){
+  if(user.status === USER_STATUS.REJECTED || user.status === USER_STATUS.PENDING){
     return next(new Error("User is inactive or pending ", { cause: 401 }));
   }
 

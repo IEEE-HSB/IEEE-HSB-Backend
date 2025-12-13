@@ -24,3 +24,33 @@ export const updateUserStates = asyncHandler(async (req, res, next) => {
     return successResponse({ res, data: updatedUser, message: "States updated successfully" });
 });
 
+export const getMe = asyncHandler(async(req,res,next)=>{
+    const {_id}=req.user;
+    console.log(req.user);
+    const user = await DBservice.findOne({ model: User, filter: { _id }, populate: { path: "chapterId", select: "code name" }});
+    if(!user){
+        return next(new Error("User not found"));
+    }
+    const response={
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        chapter: user.chapterId
+        ? {
+            id: user.chapterId._id,
+            code: user.chapterId.code,
+            name: user.chapterId.name,
+          }
+        : null,
+        status: user.status,
+        committee:user.committee,
+        level:user.level,
+        points:user.points,
+        badges:user.badges
+    }
+
+    return successResponse({ res, data: response, message: "User found successfully" });
+    
+})
+

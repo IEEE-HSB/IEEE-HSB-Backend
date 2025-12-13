@@ -8,4 +8,6 @@ router.get("/", userService.getAllUsers);
 
 router.patch("/:id/states",authMiddleware, userService.updateUserStates);
 
+router.get("/me" , authMiddleware, userService.getMe);
+
 export default router;
