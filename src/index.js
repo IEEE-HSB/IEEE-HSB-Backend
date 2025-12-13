@@ -7,6 +7,7 @@ import eventController from './modules/events/events.controller.js';
 import gallaryController from './modules/gallary/gallary.controller.js';
 import projectController from './modules/project/project.controller.js';
 import announcementController from './modules/announcement/announcement.controller.js';
+import userController from './modules/user/user.controller.js';
 import cors from 'cors';
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use('/api/events', eventController);
 app.use('/api/gallary', gallaryController);
 app.use('/api/projects', projectController);
 app.use('/api/announcements', announcementController);
+app.use('/api/user', userController);
 
 // 5. السطر ده مهم جداً: بيشغل السيرفر فقط لو إنت شغال على جهازك (Local)
 // فيرسال هيتجاهل السطر ده وهياخد الـ app من السطر الأخير

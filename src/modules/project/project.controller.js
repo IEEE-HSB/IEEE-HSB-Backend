@@ -12,13 +12,12 @@ router.get("/", projectController.getAllProjects);
 router.get("/:id", projectController.getProjectById);
 
 // 3. Create Project (Admin/Chair only)
-// بنستخدم fields عشان نرفع كذا ملف بأسماء مختلفة
 router.post(
     "/",
     authMiddleware,
     fileUpload().fields([
-        { name: "image", maxCount: 1 },       // الصورة الأساسية
-        { name: "subImages", maxCount: 5 }    // الصور الفرعية (اختياري)
+        { name: "image", maxCount: 1 },
+        { name: "subImages", maxCount: 5 }
     ]),
     projectController.createProject
 );

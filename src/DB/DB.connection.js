@@ -19,7 +19,7 @@ const connectDB = async () => {
 
   cached.conn = await cached.promise;
   console.log("Database connected");
-  console.log(cached.conn);
+//   console.log(cached.conn);
   console.log(process.env.MONGOOSE_URL);
   
   
