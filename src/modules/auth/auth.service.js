@@ -69,6 +69,10 @@ export const login = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new Error("Invalid email or password", { cause: 401 }));
   }
+  if(user.status === USER_STATUS.INACTIVE || user.status === USER_STATUS.PENDING){
+    return next(new Error("User is inactive or pending ", { cause: 401 }));
+  }
+
 
   const isPasswordValid = await bcrypt.comparePassword(
     password,
@@ -93,7 +97,7 @@ export const login = asyncHandler(async (req, res, next) => {
         }
       : null,
 
-    committee: user.committeeId, // static
+    committee: user.committee, // static
     status: user.status,
     points: user.points,
     level: user.level,
