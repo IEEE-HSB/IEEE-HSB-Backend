@@ -8,7 +8,10 @@ import gallaryController from './modules/gallary/gallary.controller.js';
 import projectController from './modules/project/project.controller.js';
 import announcementController from './modules/announcement/announcement.controller.js';
 import userController from './modules/user/user.controller.js';
+import quizController from './modules/quiz/quiz.controller.js';
+import leaderboardController from './modules/leaderboard/leaderboard.controller.js';
 import cors from 'cors';
+import { globalErrorHandler } from "./utils/response.js";
 dotenv.config();
 
 const app = express();
@@ -33,6 +36,12 @@ app.use('/api/gallary', gallaryController);
 app.use('/api/projects', projectController);
 app.use('/api/announcements', announcementController);
 app.use('/api/user', userController);
+app.use('/api/quizzes', quizController);
+app.use('/api/leaderboard', leaderboardController);
+
+
+
+app.use(globalErrorHandler);
 
 // 5. السطر ده مهم جداً: بيشغل السيرفر فقط لو إنت شغال على جهازك (Local)
 // فيرسال هيتجاهل السطر ده وهياخد الـ app من السطر الأخير

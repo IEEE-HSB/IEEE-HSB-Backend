@@ -68,3 +68,12 @@ export const findOneAndUpdate = async ({ model, filter = {}, data = {}, options 
 export const deleteOne = async ({ model, filter = {} } = {}) => {
     return await model.deleteOne(filter);
 }
+
+
+
+// ==========================================
+// 7. count Documents
+// ==================================
+export const countDocuments = async ({ model, filter = {} } = {}) => {
+    return await model.countDocuments(filter);
+}
