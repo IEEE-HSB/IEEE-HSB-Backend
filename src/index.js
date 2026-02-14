@@ -11,17 +11,38 @@ import userController from './modules/user/user.controller.js';
 import quizController from './modules/quiz/quiz.controller.js';
 import leaderboardController from './modules/leaderboard/leaderboard.controller.js';
 import cors from 'cors';
+import morgan from "morgan";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import mongoSanitize from "express-mongo-sanitize";
+import compression from "compression";
 import { globalErrorHandler } from "./utils/response.js";
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 app.use(cors());
+
+app.use(helmet());
+app.use(mongoSanitize());
+app.use(compression());
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100,
+    message: "Too many requests from this IP, please try again after 15 minutes",
+});
+
+app.use(limiter);
+
 // 1. تشغيل الـ Middlewares
 app.use(express.json());
 
 // 2. الاتصال بالداتابيز
 connectDB();
+
+app.use(morgan('dev'));
+
 
 // 3. رسالة ترحيب (Root Route)
 app.get("/", (req, res) => {
