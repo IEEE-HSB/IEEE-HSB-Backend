@@ -10,72 +10,56 @@ const USER_ROLES = Object.freeze({
 // 2. تعريف الصلاحيات (Action Based Permissions)
 // هنا بنترجم كل Endpoint لـ "فعل"
 const PERMISSIONS = {
-    // Announcements
-    MANAGE_ANNOUNCEMENTS: 'announcements:manage', // Create, Update, Delete
+    MANAGE_ANNOUNCEMENTS: 'announcements:manage',
 
-    // Chapters & Committees
-    CREATE_CHAPTER: 'chapters:create',            // Admin only
-    CREATE_COMMITTEE: 'committees:create',        // Chair & Admin
+    MANAGE_EVENTS: 'events:manage',
 
-    // Events
-    MANAGE_EVENTS: 'events:manage',               // Create, Update, Delete
+    MANAGE_GALLERY: 'gallery:manage',
 
-    // Gallery
-    MANAGE_GALLERY: 'gallery:manage',             // Create, Delete
+    VIEW_LEADERBOARD: 'leaderboard:view',
 
-    // Leaderboard
-    VIEW_LEADERBOARD: 'leaderboard:view',         // Access leaderboard
+    TAKE_QUIZ: 'quiz:take',
+    MANAGE_QUIZ: 'quiz:manage',
 
-    // Quiz
-    TAKE_QUIZ: 'quiz:take',                       // Start & Submit (Users)
-    MANAGE_QUIZ: 'quiz:manage',                   // Create, Update, Delete (Admins/Chairs)
-
-    // Users
     VIEW_ALL_USERS: 'users:view_all',
-    MANAGE_USER_STATUS: 'users:manage_status',    // Update States
+    MANAGE_USER_STATUS: 'users:manage_status',
 };
 
-// 3. توزيع الصلاحيات (Role Inheritance Matrix)
+
+
+const participantPermissions = [
+    PERMISSIONS.VIEW_LEADERBOARD,
+    PERMISSIONS.TAKE_QUIZ
+];
+
+// 2. المتطوع (بيورث من المشارك)
+const volunteerPermissions = [
+    ...participantPermissions
+];
+
+// 3. الدايركتور (بيورث من المتطوع + صلاحياته)
+const directorPermissions = [
+    ...volunteerPermissions,
+    PERMISSIONS.MANAGE_ANNOUNCEMENTS,
+    PERMISSIONS.MANAGE_EVENTS,
+    PERMISSIONS.MANAGE_GALLERY,
+    PERMISSIONS.MANAGE_USER_STATUS
+];
+
+// 4. الشيربيرسون (بيورث من الدايركتور + صلاحياته)
+const chairpersonPermissions = [
+    ...directorPermissions,
+    PERMISSIONS.VIEW_ALL_USERS
+];
+
+// 5. التجميع النهائي للمصفوفة
 const ROLE_PERMISSIONS = {
-    
-    // المشارك: بيشوف الليدربورد ويمتحن كويزات
-    [USER_ROLES.PARTICIPANT]: [
-        PERMISSIONS.VIEW_LEADERBOARD,
-        PERMISSIONS.TAKE_QUIZ
-    ],
-
-    // المتطوع: بياخد صلاحيات المشارك + ممكن حاجات زيادة مستقبلاً
-    [USER_ROLES.VOLUNTEER]: [
-        PERMISSIONS.VIEW_LEADERBOARD,
-        PERMISSIONS.TAKE_QUIZ,
-        // ممكن نضفله هنا صلاحيات تنظيمية لو احتاجنا
-    ],
-
-    // الدايركتور: بياخد صلاحيات المتطوع + إدارة الايفنتات والجلري والإعلانات
-    [USER_ROLES.DIRECTOR]: [
-        PERMISSIONS.VIEW_LEADERBOARD,
-        PERMISSIONS.TAKE_QUIZ,
-        PERMISSIONS.MANAGE_ANNOUNCEMENTS,
-        PERMISSIONS.MANAGE_EVENTS,
-        PERMISSIONS.MANAGE_GALLERY,
-        PERMISSIONS.MANAGE_USER_STATUS // يقدر يغير حالة الأعضاء اللي تحته
-    ],
-
-    // الشيربيرسون: بياخد صلاحيات الدايركتور + إدارة اللجان والكويزات
-    [USER_ROLES.CHAIRPERSON]: [
-        PERMISSIONS.MANAGE_ANNOUNCEMENTS,
-        PERMISSIONS.MANAGE_EVENTS,
-        PERMISSIONS.MANAGE_GALLERY,
-        PERMISSIONS.MANAGE_USER_STATUS,
-        PERMISSIONS.CREATE_COMMITTEE,  // خاص بالشير
-        PERMISSIONS.MANAGE_QUIZ,       // يقدر يحط كويزات
-        PERMISSIONS.VIEW_ALL_USERS     // يشوف كل اليوزرز
-    ],
-
-    // الأدمن: بياخد كل حاجة + إنشاء الشابترز
-    [USER_ROLES.ADMIN]: [
-        'ALL_ACCESS'
-    ]
+    [USER_ROLES.PARTICIPANT]: participantPermissions,
+    [USER_ROLES.VOLUNTEER]: volunteerPermissions,
+    [USER_ROLES.DIRECTOR]: directorPermissions,
+    [USER_ROLES.CHAIRPERSON]: chairpersonPermissions,
+    [USER_ROLES.ADMIN]: ['ALL_ACCESS']
 };
 
 export { USER_ROLES, PERMISSIONS, ROLE_PERMISSIONS };
+

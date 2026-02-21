@@ -28,7 +28,7 @@ app.use(mongoSanitize());
 app.use(compression());
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
+    windowMs: 15 * 60 * 1000,
     max: 100,
     message: "Too many requests from this IP, please try again after 15 minutes",
 });

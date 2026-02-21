@@ -2,6 +2,8 @@ import { Router } from "express";
 import * as projectController from "./project.service.js";
 import { fileUpload } from "../../utils/multier/cloudinary.middelware.js";
 import { authMiddleware } from "../../middleware/auth.middleware.js";
+import { authorization } from "../../middleware/authorization.js";
+import { USER_ROLES , PERMISSIONS, ROLE_PERMISSIONS } from "../../config/roles.js";
 
 const router = Router();
 
@@ -15,6 +17,7 @@ router.get("/:id", projectController.getProjectById);
 router.post(
     "/",
     authMiddleware,
+    authorization(PERMISSIONS.MANAGE_PROJECTS),
     fileUpload().fields([
         { name: "image", maxCount: 1 },
         { name: "subImages", maxCount: 5 }
@@ -26,6 +29,7 @@ router.post(
 router.patch(
     "/:id",
     authMiddleware,
+    authorization(PERMISSIONS.MANAGE_PROJECTS),
     fileUpload().fields([
         { name: "image", maxCount: 1 },
         { name: "subImages", maxCount: 5 }
@@ -34,6 +38,8 @@ router.patch(
 );
 
 // 5. Delete Project
-router.delete("/:id", authMiddleware, projectController.deleteProject);
+router.delete("/:id", authMiddleware,
+    authorization(PERMISSIONS.MANAGE_PROJECTS),
+    projectController.deleteProject);
 
 export default router;
