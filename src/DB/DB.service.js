@@ -34,12 +34,13 @@ export const findOne = async ({ model, filter = {}, select = "", populate = [] }
 export const find = async ({ model, filter = {}, select = "", populate = [], skip = 0, limit = 100, sort = {} } = {}) => {
     let query = model.find(filter).select(select).sort(sort).skip(skip).limit(limit);
     
-    if (populate && populate.length > 0) {
+    // التحقق لو الـ populate موجود سواء كان Array أو Object
+    if (populate && (Array.isArray(populate) ? populate.length > 0 : Object.keys(populate).length > 0)) {
         query = query.populate(populate);
     }
     
     return await query;
-}
+};
 
 // ==========================================
 // 4. Find By ID

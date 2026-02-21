@@ -85,6 +85,12 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
         sort: { createdAt: -1 }
     });
 
+    console.log("projects",projects);
+
+
+
+
+
     // 3. تنسيق الرد
     const formattedProjects = projects.map(p => ({
         id: p._id,
@@ -98,6 +104,8 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
         createdAt: p.createdAt,
         updatedAt: p.updatedAt
     }));
+
+    
 
     return successResponse({ res, data: formattedProjects, message: "Projects retrieved successfully" });
 });
