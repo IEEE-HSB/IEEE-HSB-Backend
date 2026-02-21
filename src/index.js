@@ -46,7 +46,7 @@ app.use(morgan('dev'));
 
 // 3. رسالة ترحيب (Root Route)
 app.get("/", (req, res) => {
-    res.json("Hello to IEEE Backend on Vercel! 🚀");
+    res.json("Hello to IEEE Backend on AWS! 🚀");
 });
 
 // 4. تعريف الروتس
