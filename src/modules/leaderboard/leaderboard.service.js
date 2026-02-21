@@ -1,6 +1,6 @@
 import User from "../../models/userModel.js";
 import { asyncHandler, successResponse } from "../../utils/response.js";
-import * as dbService from "../../DB/DB.Service.js";
+import * as dbService from "../../DB/DB.service.js";
 import QuizResult from "../../models/quizResult.model.js";
 // ================= Get Global Leaderboard =================
 export const getLeaderboard = asyncHandler(async (req, res, next) => {
