@@ -41,7 +41,7 @@ export const register = asyncHandler(async (req, res , next) => {
         passwordHash: hashedPassword,
         role,
         chapterId: chapterIdObjectId,
-        committeeId: committeeId,
+        committee: committeeId,
     }
     if(role === USER_ROLES.CHAIRPERSON || role === USER_ROLES.ADMIN){
         userData.status = USER_STATUS.ACTIVE;
