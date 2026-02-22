@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
-import { USER_LEVELS, USER_ROLES, USER_STATUS } from "../utils/enums/index.js";
-import { COMMITTEES } from "../utils/enums/committe.enum.js";
+import { USER_LEVELS, USER_ROLES, USER_STATUS ,COMMITTEES } from "../utils/enums/index.js";
 export const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -28,7 +27,7 @@ export const userSchema = new mongoose.Schema({
     committee: {
         type: String,
         enum: Object.values(COMMITTEES),
-        default: COMMITTEES.OTHER,
+        required: true,
     },
     status: {
         type: String,

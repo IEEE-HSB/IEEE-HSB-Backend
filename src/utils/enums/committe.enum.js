@@ -36,13 +36,7 @@ export const COMMITTEES = {
     FR: "FR",
     LND: "L&D",
     RND: "R&D",
-    // HR
-// Multi-Media
-// Marketing
-// FR
-// L&D
-// PR
-// R&D
+
 
     OTHER: "Other"
 };

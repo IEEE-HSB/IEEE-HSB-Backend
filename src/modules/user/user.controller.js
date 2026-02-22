@@ -3,7 +3,7 @@ import * as userService from "./user.service.js";
 import { authMiddleware } from "../../middleware/auth.middleware.js";
 
 const router = Router();
-
+router.use(authMiddleware);
 router.get("/", userService.getAllUsers);
 
 router.patch("/:id/states",authMiddleware, userService.updateUserStates);
